@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Incoming</h2>
+    <div id="messages">
+
+    </div>
+</body>
+</html>
+
+<script defer>
+    const messageBox = document.querySelector("#messages")
+    const eventSource = new EventSource("http://192.168.219.167:8000")
+
+    eventSource.onmessage = (event) => messageBox.innerHTML += `<div>${event.data}</div>`
+    </script>

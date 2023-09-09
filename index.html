@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rust Queues</title>
+</head>
+
+<body>
+    <input type="text" id="user" placeholder="Username">
+    <div style="font-size: 2rem">Messages</div>
+    <div id="messages"></div>
+    <div id="form">
+        <!-- <label for="message">Message: </label> -->
+        <input type="text" name="to" placeholder="to" id="other_user"/>
+        <input type="text" name="message" placeholder="Message" id="message"/>
+        <button onclick="sendMessage()">submit</button>
+    </fom>
+</body>
+
+</html>
+
+<style>
+    body {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        width: 10rem;
+        max-width: 100%;
+        margin: 0 auto;
+        background-color: rgb(49, 205, 59);
+        padding: 1rem;
+    }
+
+    form input {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+    }
+</style>
+
+<script defer>
+    const url = "http://192.168.219.167:8000"
+    const messages = document.getElementById("messages");
+    const userInput = document.getElementById("user");
+    const message = document.getElementById("message");
+    const other_user = document.getElementById("other_user");
+
+    userInput.addEventListener("keyup", (event) => {
+        if (event.keyCode === 13) {
+            const events = new EventSource(url + "/messages" + `?user_id=${userInput.value}`);
+            events.onmessage = (event) => {
+                messages.innerHTML += `<div>${event.data}</div>`
+                console.log(event)
+            }
+            events.onerror = (error) => {
+                messages.textContent += `\nError: ${error}`
+            }
+            event.onopen = () => {
+                console.log("connection opened")
+            }
+        }
+    });
+
+    function sendMessage() {
+        fetch(url + "/message", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                message: message.value,
+                receiver: other_user.value,
+                sender: userInput.value,
+            })
+        }
+        )
+    }
+</script>
